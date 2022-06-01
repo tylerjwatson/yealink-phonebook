@@ -49,3 +49,13 @@ services:
       - ROCKET_ADDRESS=0.0.0.0
     restart: unless-stopped
 ```
+
+## Running on Yealink Phones
+1. Access the phone's web interface and log in using your administrator credentials
+2. Click **Directory** in the top menu
+   ![image](https://user-images.githubusercontent.com/5001408/171384609-2cc58c2b-a905-4abc-8051-2c664513309b.png)
+3. Click **Remote Phonebook** on the left-hand submenu
+4. Fill out the URL and display name of your running yealink-phonebook server
+   ![image](https://user-images.githubusercontent.com/5001408/171385076-3cafa4d4-d2f9-4a5e-be8f-5b4492b17ba8.png)
+5. The contact list served by yealink-phonebook should now be visible on the device.
+
