@@ -2,6 +2,8 @@
 name = "yealink-phonebook"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+keywords = ["yealink", "phonebook", "remote phonebook", "vcf", "vcard"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
