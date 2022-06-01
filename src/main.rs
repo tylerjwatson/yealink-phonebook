@@ -24,9 +24,9 @@ SOFTWARE.
 
 mod vcard;
 
-use crate::vcard::get_contacts;
+use crate::vcard::{get_contacts, prop_value};
 use minidom::Element;
-use rocket::{serde::Deserialize, fairing::AdHoc, State, response::content::RawXml};
+use rocket::{fairing::AdHoc, response::content::RawXml, serde::Deserialize, State};
 use url::Url;
 
 #[macro_use]
@@ -40,38 +40,25 @@ struct Config {
 
 #[get("/")]
 async fn index(config: &State<Config>) -> RawXml<String> {
-    let contact_url: Url = config.vcf_url
-        .parse()
-        .expect("Invalid VCF Url");
+    let contact_url: Url = config.vcf_url.parse().expect("Invalid VCF Url");
 
     let cards = get_contacts(contact_url).await.expect("Cannot get cards");
 
     let mut builder = Element::builder("IPPhoneDirectory", "");
 
     for card in cards {
-        let mut entry = Element::builder("DirectoryEntry", "");
+        let name = prop_value(&card.properties, "FN");
+        let tel = prop_value(&card.properties, "TEL");
 
-        if let Some(name) = card.properties.iter().find(|i| i.name == "FN") {
-            let name_element = Element::builder("Name", "")
-                .append(match &name.value {
-                    Some(v) => v,
-                    None => "Unknown",
-                })
-                .build();
-            entry = entry.append(name_element);
-        };
+        if tel == None {
+            continue;
+        }
 
-        if let Some(tel) = card.properties.iter().find(|i| i.name == "TEL") {
-            let tel_element = Element::builder("Telephone", "")
-                .append(match &tel.value {
-                    Some(v) => v,
-                    None => "Unknown",
-                })
-                .build();
-            entry = entry.append(tel_element);
-        };
-
-        builder = builder.append(entry);
+        builder = builder.append(
+            Element::builder("DirectoryEntry", "")
+                .append(Element::builder("Name", "").append(name.unwrap()))
+                .append(Element::builder("Telephone", "").append(tel.unwrap())),
+        );
     }
 
     RawXml(String::from(&builder.build()))
@@ -86,7 +73,7 @@ fn launch() -> rocket::Rocket<rocket::Build> {
     let figment = rocket.figment();
 
     let config = figment.extract::<Config>().expect("A VCF URL is required.");
-    
+
     println!("yealink-phonebook using VCF URL {}", &config.vcf_url);
 
     rocket

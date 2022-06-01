@@ -23,8 +23,18 @@ SOFTWARE.
 */
 
 use std::{error::Error, io::BufReader};
-use ical::parser::vcard::component::VcardContact;
+use ical::{parser::vcard::component::VcardContact, property::Property};
 use url::Url;
+
+pub fn prop_value<'a>(props: &'a Vec<Property>, name: &str) -> Option<&'a str> {
+    match props.iter().find(|i| i.name.contains(name)) {
+        Some(prop) => match &prop.value {
+            Some(v) => Some(v),
+            None => None
+        },
+        None => None
+    }
+}
 
 pub async fn get_contacts(url: Url) -> Result<Vec<VcardContact>, Box<dyn Error>> {
     let resp = reqwest::get(url).await?;
