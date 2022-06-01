@@ -16,5 +16,5 @@ keywords = ["yealink", "phonebook", "vcf", "vcard"]
 rocket = "0.5.0-rc.2"
 reqwest = { version = "0.11.10", features = [ "stream" ] }
 url = "2.2"
-ical = { version = "*", features = ["vcard"] }
+ical = { version = "0.7", features = ["vcard"] }
 minidom = "0.14"
